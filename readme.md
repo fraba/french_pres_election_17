@@ -3,26 +3,7 @@ Results of the first round of the 2017 French presidential election (commune lev
 Francesco Bailo
 May 5, 2017
 
-    ## Loading required package: sp
-
-    ## Loading required package: rgdal
-
-    ## rgdal: version: 1.2-5, (SVN revision 648)
-    ##  Geospatial Data Abstraction Library extensions to R successfully loaded
-    ##  Loaded GDAL runtime: GDAL 2.1.2, released 2016/10/24
-    ##  Path to GDAL shared files: /usr/local/share/gdal
-    ##  Loaded PROJ.4 runtime: Rel. 4.9.1, 04 March 2015, [PJ_VERSION: 491]
-    ##  Path to PROJ.4 shared files: (autodetected)
-    ##  Linking to sp version: 1.2-3
-
-    ## OGR data source with driver: ESRI Shapefile 
-    ## Source: "/Users/francesco/public_git/french_pres_election_17/communes-20170112", layer: "communes-20170112-arrond-simpl"
-    ## with 35461 features
-    ## It has 4 fields
-
-    ## Loading required package: RColorBrewer
-
-![](readme_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![plots](https://github.com/fraba/french_pres_election_17/raw/master/figures/fig1.jpg)
 
 Data collection
 ===============
@@ -176,7 +157,7 @@ Results
 
 The resulting file (`results_fr_20170423`) contains 35,537 rows (communes and arrondissements) and looks like this
 
-| uri                                                                 | code\_region | code\_department | code\_commune | desc\_commune     |  MÉLENCHON|  LE.PEN|  MACRON|  FILLON|  HAMON|  DUPONT.AIGNAN|  LASSALLE|  POUTOU|  ARTHAUD|  CHEMINADE|  ASSELINEAU|  Inscrits|  Abstentions|  Votants|  Blancs|  Nuls|  Exprimés| code\_commune\_join |  MÉLENCHON..|   LE.PEN..|   MACRON..|   FILLON..|    HAMON..|  DUPONT.AIGNAN..|  LASSALLE..|   POUTOU..|  ARTHAUD..|  CHEMINADE..|  ASSELINEAU..|
+| uri                                                                 | code\_region | code\_department | code\_commune | desc\_commune     |  MÉLENCHON|  LE PEN|  MACRON|  FILLON|  HAMON|  DUPONT-AIGNAN|  LASSALLE|  POUTOU|  ARTHAUD|  CHEMINADE|  ASSELINEAU|  Inscrits|  Abstentions|  Votants|  Blancs|  Nuls|  Exprimés| code\_commune\_join |  MÉLENCHON %|   LE PEN %|   MACRON %|   FILLON %|    HAMON %|  DUPONT-AIGNAN %|  LASSALLE %|   POUTOU %|  ARTHAUD %|  CHEMINADE %|  ASSELINEAU %|
 |:--------------------------------------------------------------------|:-------------|:-----------------|:--------------|:------------------|----------:|-------:|-------:|-------:|------:|--------------:|---------:|-------:|--------:|----------:|-----------:|---------:|------------:|--------:|-------:|-----:|---------:|:--------------------|------------:|----------:|----------:|----------:|----------:|----------------:|-----------:|----------:|----------:|------------:|-------------:|
 | elections.interieur.gouv.fr/presidentielle-2017/000/975/975501.html | 000          | 975              | 97501         | Miquelon-Langlade |         89|      60|      42|      27|     18|              9|         6|       4|        2|          2|           2|       495|          226|      269|       5|     3|       261| 97501               |    0.3409962|  0.2298851|  0.1609195|  0.1034483|  0.0689655|        0.0344828|   0.0229885|  0.0153257|  0.0076628|    0.0076628|     0.0076628|
 | elections.interieur.gouv.fr/presidentielle-2017/000/975/975502.html | 000          | 975              | 97502         | Saint-Pierre      |        844|     418|     431|     234|    199|             70|        48|      60|       26|          7|          34|      4471|         2012|     2459|      65|    23|      2371| 97502               |    0.3559679|  0.1762969|  0.1817798|  0.0986925|  0.0839308|        0.0295234|   0.0202446|  0.0253058|  0.0109658|    0.0029523|     0.0143399|
