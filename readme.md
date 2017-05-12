@@ -1,7 +1,15 @@
-Results of the first round of the 2017 French presidential election (commune level)
+Results of the 2017 French presidential election (commune level)
 ================
 Francesco Bailo
 May 5, 2017
+
+Le Pen vs Macron (first and second round)
+=========================================
+
+![plots](https://github.com/fraba/french_pres_election_17/raw/master/figures/fig2.jpg)
+
+First round
+===========
 
 ![plots](https://github.com/fraba/french_pres_election_17/raw/master/figures/fig1.jpg)
 
@@ -61,7 +69,7 @@ parse <- function(this_file, this_uri = NULL) {
 }
 ```
 
-and this code
+and this code (replace `results_fr_20170423.RData` with `results_fr_20170507.RData` for results of the second round)
 
 ``` r
 output_file <- 'results_fr_20170423.RData'
@@ -155,6 +163,8 @@ for (n in colnames(results_fr_20170423)[6:16]) {
 Results
 -------
 
+### First round
+
 The resulting file (`results_fr_20170423`) contains 35,537 rows (communes and arrondissements) and looks like this
 
 | uri                                                                 | code\_region | code\_department | code\_commune | desc\_commune     |  MÉLENCHON|  LE PEN|  MACRON|  FILLON|  HAMON|  DUPONT-AIGNAN|  LASSALLE|  POUTOU|  ARTHAUD|  CHEMINADE|  ASSELINEAU|  Inscrits|  Abstentions|  Votants|  Blancs|  Nuls|  Exprimés| code\_commune\_join |  MÉLENCHON %|   LE PEN %|   MACRON %|   FILLON %|    HAMON %|  DUPONT-AIGNAN %|  LASSALLE %|   POUTOU %|  ARTHAUD %|  CHEMINADE %|  ASSELINEAU %|
@@ -171,6 +181,25 @@ The resulting file (`results_fr_20170423`) contains 35,537 rows (communes and ar
 | elections.interieur.gouv.fr/presidentielle-2017/000/987/987046.html | 000          | 987              | 987046        | Tahuata           |          6|     151|      23|      76|      1|              2|         1|       1|        3|          0|           1|       602|          331|      271|       0|     6|       265| 987046              |    0.0226415|  0.5698113|  0.0867925|  0.2867925|  0.0037736|        0.0075472|   0.0037736|  0.0037736|  0.0113208|    0.0000000|     0.0037736|
 
 In total, 36,071,776 votes are assigned to a candidate.
+
+### Second round
+
+The resulting file (`results_fr_20170507`) contains 35,539 rows (communes and arrondissements) and looks like this
+
+| uri                                                                 | code\_region | code\_department | code\_commune | desc\_commune     |  MACRON|  LE PEN|  Inscrits|  Abstentions|  Votants|  Blancs|  Nuls|  Exprimés| code\_commune\_join |   MACRON %|   LE PEN %|
+|:--------------------------------------------------------------------|:-------------|:-----------------|:--------------|:------------------|-------:|-------:|---------:|------------:|--------:|-------:|-----:|---------:|:--------------------|----------:|----------:|
+| elections.interieur.gouv.fr/presidentielle-2017/000/975/975501.html | 000          | 975              | 97501         | Miquelon-Langlade |     146|     104|       495|          205|      290|      30|    10|       250| 97501               |  0.5840000|  0.4160000|
+| elections.interieur.gouv.fr/presidentielle-2017/000/975/975502.html | 000          | 975              | 97502         | Saint-Pierre      |    1321|     747|      4468|         1979|     2489|     276|   145|      2068| 97502               |  0.6387814|  0.3612186|
+| elections.interieur.gouv.fr/presidentielle-2017/000/977/977801.html | 000          | 977              | 97801         | Saint-Martin      |    3857|    1826|     20152|        13919|     6233|     383|   167|      5683| 97801               |  0.6786908|  0.3213092|
+| elections.interieur.gouv.fr/presidentielle-2017/000/977/977701.html | 000          | 977              | 97701         | Saint-Barthélémy  |    1425|    1014|      5295|         2535|     2760|     255|    66|      2439| 97701               |  0.5842558|  0.4157442|
+| elections.interieur.gouv.fr/presidentielle-2017/000/987/987029.html | 000          | 987              | 987029        | Moorea-Maiao      |    2850|    2950|     13118|         6937|     6181|     220|   161|      5800| 987029              |  0.4913793|  0.5086207|
+| elections.interieur.gouv.fr/presidentielle-2017/000/987/987057.html | 000          | 987              | 987057        | Ua-Pou            |     416|     464|      1565|          660|      905|      11|    14|       880| 987057              |  0.4727273|  0.5272727|
+| elections.interieur.gouv.fr/presidentielle-2017/000/987/987054.html | 000          | 987              | 987054        | Tumaraa           |    1168|     625|      3113|         1127|     1986|      17|   176|      1793| 987054              |  0.6514222|  0.3485778|
+| elections.interieur.gouv.fr/presidentielle-2017/000/987/987030.html | 000          | 987              | 987030        | Napuka            |      24|     113|       272|          131|      141|       0|     4|       137| 987030              |  0.1751825|  0.8248175|
+| elections.interieur.gouv.fr/presidentielle-2017/000/987/987032.html | 000          | 987              | 987032        | Nukutavake        |      76|      78|       291|          128|      163|       9|     0|       154| 987032              |  0.4935065|  0.5064935|
+| elections.interieur.gouv.fr/presidentielle-2017/000/987/987046.html | 000          | 987              | 987046        | Tahuata           |     149|     167|       602|          281|      321|       5|     0|       316| 987046              |  0.4715190|  0.5284810|
+
+In total, 31,468,034 votes are assigned to a candidate.
 
 Mapping
 =======
