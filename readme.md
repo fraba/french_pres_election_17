@@ -1,7 +1,7 @@
 Results of the 2017 French presidential election (commune level)
 ================
 Francesco Bailo
-May 5, 2017
+May 12, 2017
 
 Le Pen vs Macron (first and second round)
 =========================================
@@ -200,6 +200,50 @@ The resulting file (`results_fr_20170507`) contains 35,539 rows (communes and ar
 | elections.interieur.gouv.fr/presidentielle-2017/000/987/987046.html | 000          | 987              | 987046        | Tahuata           |     149|     167|       602|          281|      321|       5|     0|       316| 987046              |  0.4715190|  0.5284810|
 
 In total, 31,468,034 votes are assigned to a candidate.
+
+Census data
+===========
+
+The file `results_fr_20170423_wt_demog` also contains 2013 census data based on the 2017 administrative division at the commune level. Two census datafiles were used: `BTT_TD_IMG3A_2013.txt` and `BTT_TD_IMG2A_2013.txt`. They are available [here](https://www.insee.fr/fr/information/2409289).
+
+The number of immigrants, retired and unemployed from each commune was computed with
+
+``` r
+require(dplyr)
+pop_immi_empl_by_commune <- 
+  BTT_TD_IMG3A_2013 %>%
+  group_by(NIVGEO, CODGEO) %>%
+  summarize(
+    immigrants = sum(NB[IMMI == 1]),
+    nonimmigrants = sum(NB[IMMI == 2])
+  )
+
+unemployment_by_commune <- 
+  BTT_TD_IMG2A_2013 %>%
+  group_by(NIVGEO, CODGEO) %>%
+  summarize(
+    actifs = sum(NB[TACTR == 11]),
+    chomeurs = sum(NB[TACTR == 12]),
+    retraites_IMG2A = sum(NB[TACTR == 21])
+    )
+```
+
+Because the the number of communes and their boundaries are changed between 2013 and 2017, I randomly distributed `n` points within the boundaries of the 2013 communes (with `n` corresponding to the number of people in the different categories) and counted the number of random points within each boundary of the 2017 communes.
+
+The resulting file contains 35,454 rows (communes and arrondissements) and looks like this
+
+| code\_commune\_join | uri                                                                 | code\_region | code\_department | code\_commune | desc\_commune           |  MÉLENCHON|  LE PEN|  MACRON|  FILLON|  HAMON|  DUPONT-AIGNAN|  LASSALLE|  POUTOU|  ARTHAUD|  CHEMINADE|  ASSELINEAU|  Inscrits|  Abstentions|  Votants|  Blancs|  Nuls|  Exprimés|  MÉLENCHON %|   LE PEN %|   MACRON %|   FILLON %|    HAMON %|  DUPONT-AIGNAN %|  LASSALLE %|   POUTOU %|  ARTHAUD %|  CHEMINADE %|  ASSELINEAU %|  immigrants|  retraites\_img2a|  chomeurs|  actifs|  nb\_index|  immigrants\_50km|  retraites\_img2a\_50km|  chomeurs\_50km|  actifs\_50km|  inscrits\_50km|  surf\_ha|
+|:--------------------|:--------------------------------------------------------------------|:-------------|:-----------------|:--------------|:------------------------|----------:|-------:|-------:|-------:|------:|--------------:|---------:|-------:|--------:|----------:|-----------:|---------:|------------:|--------:|-------:|-----:|---------:|------------:|----------:|----------:|----------:|----------:|----------------:|-----------:|----------:|----------:|------------:|-------------:|-----------:|-----------------:|---------:|-------:|----------:|-----------------:|-----------------------:|---------------:|-------------:|---------------:|---------:|
+| 01001               | elections.interieur.gouv.fr/presidentielle-2017/084/001/001001.html | 084          | 001              | 001001        | L'Abergement-Clémenciat |         59|     126|     119|     110|     29|             34|         2|       4|        4|          2|           6|       598|           92|      506|       2|     9|       495|    0.1191919|  0.2545455|  0.2404040|  0.2222222|  0.0585859|        0.0686869|   0.0040404|  0.0080808|  0.0080808|    0.0040404|     0.0121212|          31|               182|        30|     323|      11652|            267998|                  411576|          127923|        879423|         1563234|      1567|
+| 01002               | elections.interieur.gouv.fr/presidentielle-2017/084/001/001002.html | 084          | 001              | 001002        | L'Abergement-de-Varey   |         33|      48|      37|      34|     13|              6|         0|       2|        2|          0|           1|       209|           25|      184|       6|     2|       176|    0.1875000|  0.2727273|  0.2102273|  0.1931818|  0.0738636|        0.0340909|   0.0000000|  0.0113636|  0.0113636|    0.0000000|     0.0056818|          12|                57|         9|     109|      25174|            470615|                  607856|          196217|       1408144|          801504|       909|
+| 01004               | elections.interieur.gouv.fr/presidentielle-2017/084/001/001004.html | 084          | 001              | 001004        | Ambérieu-en-Bugey       |       1412|    1667|    1332|    1084|    344|            346|        60|      91|       40|          5|          71|      8586|         1962|     6624|     114|    58|      6452|    0.2188469|  0.2583695|  0.2064476|  0.1680099|  0.0533168|        0.0536268|   0.0092994|  0.0141042|  0.0061996|    0.0007750|     0.0110043|        1418|              2905|       958|    5872|      25190|            421234|                  582357|          182263|       1304080|         1577516|      2449|
+| 01005               | elections.interieur.gouv.fr/presidentielle-2017/084/001/001005.html | 084          | 001              | 001005        | Ambérieux-en-Dombes     |        126|     306|     191|     197|     37|             45|         6|      10|        5|          0|          10|      1172|          215|      957|      21|     3|       933|    0.1350482|  0.3279743|  0.2047160|  0.2111468|  0.0396570|        0.0482315|   0.0064309|  0.0107181|  0.0053591|    0.0000000|     0.0107181|          61|               320|        67|     781|      25239|            248659|                  386194|          119816|        826488|         1854925|      1602|
+| 01006               | elections.interieur.gouv.fr/presidentielle-2017/084/001/001006.html | 084          | 001              | 001006        | Ambléon                 |         19|      18|      15|      14|      3|              4|         1|       2|        1|          0|           0|        99|           20|       79|       2|     0|        77|    0.2467532|  0.2337662|  0.1948052|  0.1818182|  0.0389610|        0.0519481|   0.0129870|  0.0259740|  0.0129870|    0.0000000|     0.0000000|          23|                30|         2|      52|      29586|            225939|                  458840|          124414|        869552|          911070|       597|
+| 01007               | elections.interieur.gouv.fr/presidentielle-2017/084/001/001007.html | 084          | 001              | 001007        | Ambronay                |        296|     458|     348|     233|     82|             80|        13|      17|        9|          1|          11|      1880|          268|     1612|      53|    11|      1548|    0.1912145|  0.2958656|  0.2248062|  0.1505168|  0.0529716|        0.0516796|   0.0083979|  0.0109819|  0.0058140|    0.0006460|     0.0071059|          97|               488|       105|    1138|      25193|            465756|                  589640|          192519|       1390830|         1481341|      3364|
+| 01008               | elections.interieur.gouv.fr/presidentielle-2017/084/001/001008.html | 084          | 001              | 001008        | Ambutrix                |         89|     135|      95|      84|     23|             28|         3|       8|        3|          3|           2|       581|           91|      490|      12|     5|       473|    0.1881607|  0.2854123|  0.2008457|  0.1775899|  0.0486258|        0.0591966|   0.0063425|  0.0169133|  0.0063425|    0.0063425|     0.0042283|          13|               121|        32|     382|      25182|            344925|                  482680|          148416|       1094388|         1721686|       522|
+| 01009               | elections.interieur.gouv.fr/presidentielle-2017/084/001/001009.html | 084          | 001              | 001009        | Andert-et-Condon        |         39|      40|      55|      44|      8|              6|         8|       3|        0|          0|           6|       254|           41|      213|       1|     3|       209|    0.1866029|  0.1913876|  0.2631579|  0.2105263|  0.0382775|        0.0287081|   0.0382775|  0.0143541|  0.0000000|    0.0000000|     0.0287081|          12|                90|        12|     144|      29611|            210457|                  450467|          119734|        838619|          829583|       701|
+| 01010               | elections.interieur.gouv.fr/presidentielle-2017/084/001/001010.html | 084          | 001              | 001010        | Anglefort               |        103|     207|     110|      83|     20|             33|        14|       5|        3|          1|          10|       738|          136|      602|       2|    11|       589|    0.1748727|  0.3514431|  0.1867572|  0.1409168|  0.0339559|        0.0560272|   0.0237691|  0.0084890|  0.0050934|    0.0016978|     0.0169779|          70|               231|        62|     450|      32973|            306535|                  544607|          156572|       1079261|          770913|      2963|
+| 01011               | elections.interieur.gouv.fr/presidentielle-2017/084/001/001011.html | 084          | 001              | 001011        | Apremont                |         30|      64|      49|      46|     13|              9|         4|       4|        4|          0|           1|       275|           43|      232|       6|     2|       224|    0.1339286|  0.2857143|  0.2187500|  0.2053571|  0.0580357|        0.0401786|   0.0178571|  0.0178571|  0.0178571|    0.0000000|     0.0044643|          33|                81|        21|     183|      25366|            476263|                  623909|          204413|       1420630|          570055|      1498|
 
 Mapping
 =======
