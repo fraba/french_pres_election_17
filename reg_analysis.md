@@ -52,7 +52,7 @@ Le Pen votes over Valid votes
 Immigrants over Registered voters
 </td>
 <td>
--0.127<sup>\*\*\*</sup>
+-0.127<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -73,7 +73,7 @@ Immigrants over Registered voters
 Immigrants over Registered voters (communes within 50km radius)
 </td>
 <td>
--0.121<sup>\*\*\*</sup>
+-0.121<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -94,7 +94,7 @@ Immigrants over Registered voters (communes within 50km radius)
 Unemployed over Workforce
 </td>
 <td>
-0.391<sup>\*\*\*</sup>
+0.391<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -115,7 +115,7 @@ Unemployed over Workforce
 Unemployed over Workforce (communes within 50km radius)
 </td>
 <td>
--0.134<sup>\*\*\*</sup>
+-0.134<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -136,7 +136,7 @@ Unemployed over Workforce (communes within 50km radius)
 Retired over Registered voters
 </td>
 <td>
--0.197<sup>\*\*\*</sup>
+-0.197<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -157,7 +157,7 @@ Retired over Registered voters
 Retired over Registered voters (communes within 50km radius)
 </td>
 <td>
-0.104<sup>\*\*\*</sup>
+0.104<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -178,7 +178,7 @@ Retired over Registered voters (communes within 50km radius)
 Registered voters over commune surface
 </td>
 <td>
--0.0002<sup>\*\*\*</sup>
+-0.0002<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -199,7 +199,7 @@ Registered voters over commune surface
 Constant
 </td>
 <td>
-0.283<sup>\*\*\*</sup>
+0.283<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -256,7 +256,7 @@ Residual Std. Error
 F Statistic
 </td>
 <td>
-757.774<sup>\*\*\*</sup> (df = 7; 35420)
+757.774<sup>***</sup> (df = 7; 35420)
 </td>
 </tr>
 <tr>
