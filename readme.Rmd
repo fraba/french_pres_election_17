@@ -1,0 +1,236 @@
+---
+title: "Results of the 2017 French presidential election (commune level)"
+author: Francesco Bailo
+date: May 12, 2017
+output: github_document
+---
+
+# Le Pen vs Macron (first and second round)
+
+![plots](https://github.com/fraba/french_pres_election_17/raw/master/figures/fig2.jpg)
+
+
+# First round
+
+![plots](https://github.com/fraba/french_pres_election_17/raw/master/figures/fig1.jpg)
+
+```{r echo = FALSE}
+
+load('/Users/francesco/public_git/french_pres_election_17/results_fr_20170423.RData')
+load('/Users/francesco/public_git/french_pres_election_17/results_fr_20170507.RData')
+load('/Users/francesco/public_git/french_pres_election_17/results_fr_20170423_wt_demog.RData')
+
+```
+
+
+# Data collection
+
+Result pages were downloaded from the [website](http://elections.interieur.gouv.fr/presidentielle-2017/) of the French Ministry of Interior with `wget -r -w 5 --accept html http://elections.interieur.gouv.fr/presidentielle-2017/` and then parsed with the following R function
+
+```{r echo = T, eval = F} 
+parse <- function(this_file, this_uri = NULL) {
+  
+  if (is.null(this_uri)) {
+    system(paste0("scp francesco@XXX.XXX.XX.XXX:", this_file, " tmp.html"))
+    this_page <- read_html("tmp.html")  
+  } else {
+    this_file <- this_uri
+    this_page <- try({read_html(this_uri)})
+    if (any(class(this_page) %in% 'try-error')) return(NULL)
+  }
+  
+  code_region <- str_extract_all(this_file, "\\b\\d{3}\\b")[[1]][1]
+  code_department <- str_extract_all(this_file, "\\b\\d{3}\\b")[[1]][2]
+  code_commune <- str_extract(this_file, "\\d{6}")
+  uri <- gsub("/mnt/francesco/fr_election17/", "", this_file)
+  
+  print(code_commune)
+  
+  desc_commune <- 
+    this_page %>%
+    html_node(xpath = '//*[@id="top"]/div[2]/div[1]/div[4]/div/h3[1]') %>%
+    html_text() %>%
+    str_replace("Commune de ", "") %>%
+    str_trim()
+  
+  df_part1 <- 
+    data.frame(uri, code_region, code_department, code_commune, desc_commune, stringsAsFactors = FALSE)
+  
+  tables <- 
+    this_page %>% 
+    html_nodes("table") %>%
+    html_table(header = TRUE)
+  
+  df_part2 <- as.data.frame(t(tables[[2]]['Voix']))
+  this_columns <- str_trim(tables[[2]][['Liste des candidats']])
+  last_lower_chr <- sapply(this_columns, FUN = function(x) max(which(grepl("[a-z]", strsplit(x, split = "")[[1]]))))
+  last_chr <- sapply(this_columns, nchar)
+  this_columns <- mapply(substr, this_columns, last_lower_chr + 2, last_chr)
+  colnames(df_part2) <- this_columns
+  
+  df_part3 <- as.data.frame(t(tables[[3]]['Nombre']))
+  colnames(df_part3) <- tables[[3]][[1]]
+  
+  this_results <- cbind(df_part1, df_part2, df_part3)
+  row.names(this_results) <- NULL 
+  unlink("tmp.html")
+  return(this_results)
+}
+```
+
+and this code (replace `results_fr_20170423.RData` with `results_fr_20170507.RData` for results of the second round)
+
+```{r echo = T, eval = F}
+
+output_file <- 'results_fr_20170423.RData'
+
+all_files <- read.table(pipe('ssh francesco@XXX.XXX.XX.XXX "find /mnt/francesco/fr_election17/elections.interieur.gouv.fr -name *.html"'))
+all_files <- as.character(all_files$V1)
+all_files <- all_files[grepl("\\d{6}", all_files)]
+all_remote_codes <- sapply(all_files, FUN = function(x) str_extract_all(x, "\\d{6}")[[1]], USE.NAMES = F) 
+all_files <- 
+  all_files[!all_remote_codes %in% results_fr_20170423$code_commune]
+
+for (this_file in all_files) {
+  results_fr_20170423 <- rbind(results_fr_20170423, parse(this_file))
+  save(results_fr_20170423, file = output_file)
+}
+```
+
+# Data preparation
+
+## Addition of arrondissements' INSEE codes for Paris, Lyon and Marseille
+
+```{r echo = T, eval = F}
+
+which_arr <- which(is.na(results_fr_20170423$desc_commune))
+uri_arr <- results_fr_20170423$uri[which_arr]
+insee_arr <- list('Paris' = list(code = '075056', range = 75101:75120), 
+                  "Lyon" = list(code = '069123', range = 69381:69389), 
+                  "Marseille" = list(code = '013055', range = 13201:13216))
+for (i in 1:length(insee_arr)) {
+  results_fr_20170423$desc_commune[results_fr_20170423$code_commune == insee_arr[[i]]$code] <- 
+    names(insee_arr)[i]
+  ordered_uri <- results_fr_20170423$uri[results_fr_20170423$code_commune == insee_arr[[i]]$code]
+  ordered_uri <- ordered_uri[order(ordered_uri)]
+  for (j in 1:length(ordered_uri)) {
+    results_fr_20170423$code_commune[results_fr_20170423$uri == ordered_uri[j]] <- 
+      sprintf("%06d", insee_arr[[i]]$range[j])
+  }
+}
+
+results_fr_20170423 <- results_fr_20170423[!results_fr_20170423$code_commune %in% c('0000NA', '069846'),] 
+
+```
+
+## Addition of Corse's INSEE codes
+
+```{r echo = T, eval = F}
+## Corse
+uri_commune_corse <- results_fr_20170423$uri[grepl("/02B/|/02A/", results_fr_20170423$uri)]
+
+require(stringr)
+for(uri in uri_commune_corse){
+  results_fr_20170423$code_department[results_fr_20170423$uri == uri] <- 
+    str_extract(results_fr_20170423$uri[results_fr_20170423$uri == uri], "02[A-B]")
+  results_fr_20170423$code_commune[results_fr_20170423$uri == uri] <- 
+    str_extract(results_fr_20170423$uri[results_fr_20170423$uri == uri], "02[A-B]\\d{3}")
+}
+```
+
+
+## Transformation of INSEE code for a few overseas territories (it differed from codes in [shapefile](http://osm13.openstreetmap.fr/~cquest/openfla/export/communes-20170111-shp.zip))
+
+```{r echo = T, eval = F}
+
+results_fr_20170423$code_commune[grepl("^97", results_fr_20170423$code_commune)] <- 
+  gsub("97[0-9]", "97", results_fr_20170423$code_commune[grepl("^97", results_fr_20170423$code_commune)])
+
+results_fr_20170423$code_commune[grepl("^976", results_fr_20170423$code_department)] <- 
+  gsub("975", "976", results_fr_20170423$code_commune[grepl("^976", results_fr_20170423$code_department)])
+```
+
+
+## Elimination of duplicate rows and creation of join column compatible with [this shapefile](http://osm13.openstreetmap.fr/~cquest/openfla/export/communes-20170111-shp.zip) and [this shapefile](http://osm13.openstreetmap.fr/~cquest/openfla/export/arrondissements-municipaux-20160128-shp.zip) (`Arrondissements Municipaux (janvier 2016)`).
+
+```{r echo = T, eval = F}
+results_fr_20170423 <- results_fr_20170423[!duplicated(results_fr_20170423$code_commune),]
+results_fr_20170423$code_commune_join <- gsub("^0", "", results_fr_20170423$code_commune)
+```
+
+## Conversion to numeric and addition to percentage column
+
+```{r echo = T, eval = F}
+results_fr_20170423[,6:22] <- apply(results_fr_20170423[,6:22], 2,
+                                    FUN = function(x) as.numeric(gsub("[^0-9]", "", x)))
+
+for (n in colnames(results_fr_20170423)[6:16]) {
+  results_fr_20170423[[paste0(n, " %")]] <- results_fr_20170423[[n]] / results_fr_20170423[['Exprimés']]
+}
+```
+
+## Results
+
+### First round
+
+The resulting file (`results_fr_20170423`) contains `r prettyNum(nrow(results_fr_20170423),big.mark=",",scientific=FALSE)` rows (communes and arrondissements) and looks like this
+
+```{r echo=FALSE, results='asis', message = F, warning = F}
+require(knitr)
+kable(results_fr_20170423[1:10,])
+```
+
+In total, `r prettyNum(sum(results_fr_20170423$Exprimés),big.mark=",",scientific=FALSE)` votes are assigned to a candidate.
+
+### Second round
+
+The resulting file (`results_fr_20170507`) contains `r prettyNum(nrow(results_fr_20170507),big.mark=",",scientific=FALSE)` rows (communes and arrondissements) and looks like this
+
+```{r echo=FALSE, results='asis', message = F, warning = F}
+require(knitr)
+kable(results_fr_20170507[1:10,])
+```
+
+In total, `r prettyNum(sum(results_fr_20170507$Exprimés),big.mark=",",scientific=FALSE)` votes are assigned to a candidate.
+
+# Census data
+
+The file `results_fr_20170423_wt_demog` also contains 2013 census data based on the 2017 administrative division at the commune level. Two census datafiles were used: `BTT_TD_IMG3A_2013.txt` and `BTT_TD_IMG2A_2013.txt`. They are available [here](https://www.insee.fr/fr/information/2409289).
+
+The number of immigrants, retired and unemployed from each commune was computed with
+
+```{r echo = T, eval = F}
+
+require(dplyr)
+pop_immi_empl_by_commune <- 
+  BTT_TD_IMG3A_2013 %>%
+  group_by(NIVGEO, CODGEO) %>%
+  summarize(
+    immigrants = sum(NB[IMMI == 1]),
+    nonimmigrants = sum(NB[IMMI == 2])
+  )
+
+unemployment_by_commune <- 
+  BTT_TD_IMG2A_2013 %>%
+  group_by(NIVGEO, CODGEO) %>%
+  summarize(
+    actifs = sum(NB[TACTR == 11]),
+    chomeurs = sum(NB[TACTR == 12]),
+    retraites_IMG2A = sum(NB[TACTR == 21])
+    )
+
+```
+
+Because the the number of communes and their boundaries are changed between 2013 and 2017, I randomly distributed `n` points within the boundaries of the 2013 communes (with `n` corresponding to the number of people in the different categories) and counted the number of random points within each boundary of the 2017 communes. 
+
+The resulting file contains `r prettyNum(nrow(results_fr_20170423_wt_demog),big.mark=",",scientific=FALSE)` rows (communes and arrondissements) and looks like this
+
+```{r echo=FALSE, results='asis', message = F, warning = F}
+require(knitr)
+kable(results_fr_20170423_wt_demog[1:10,])
+```
+
+
+# Mapping
+
+Observations can be linked to shapefiles provided [on this page](https://www.data.gouv.fr/fr/datasets/decoupage-administratif-communal-francais-issu-d-openstreetmap/) (you will need to merge these two shapefiles: [here](http://osm13.openstreetmap.fr/~cquest/openfla/export/communes-20170111-shp.zip) and [here](http://osm13.openstreetmap.fr/~cquest/openfla/export/arrondissements-municipaux-20160128-shp.zip) since city-wide results for Paris, Lyon and Marseille are not provided) by merging the `code_commune_join` column of `results_fr_20170423` onto the `insee` column of the shapefile.

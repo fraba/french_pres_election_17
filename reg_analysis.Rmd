@@ -1,0 +1,133 @@
+---
+title: "Regression analysis of results of the first round of the 2017 French presidential election (commune level)"
+author: Francesco Bailo
+date: May 12, 2017
+output: github_document
+---
+
+# Results by region
+
+```{r}
+load('~/public_git/french_pres_election_17/results_fr_20170423_wt_demog.RData')
+
+require(dplyr)
+
+region_grouped <- 
+  results_fr_20170423_wt_demog %>%
+  group_by(code_region) %>%
+  summarize(`LE PEN %` = sum(`LE PEN`) / sum(Exprimés),
+            immigrants = sum(immigrants),
+            chomeurs = sum(chomeurs),
+            actifs = sum(actifs),
+            retraites_img2a = sum(retraites_img2a),
+            surf_ha = sum(surf_ha),
+            Inscrits = sum(Inscrits))
+
+mod_reg1 <- 
+  lm("I(`LE PEN %`) ~ 
+    I(immigrants/Inscrits) + 
+    I(chomeurs/(chomeurs+actifs)) + 
+    I(retraites_img2a/Inscrits) + 
+    I(Inscrits/surf_ha)", 
+     data = region_grouped)
+
+```
+
+```{r, echo=F, message=F, warning=F, results='asis'}
+require(stargazer)
+stargazer(mod_reg1, type='html',
+          covariate.labels = c("Immigrants over Registered voters", 
+                               "Unemployed over Workforce",
+                               "Retired over Registered voters",
+                               "Registered voters over region surface"),
+          dep.var.labels   = "Le Pen votes over Valid votes",
+          dep.var.caption  = "First round - Regional level")
+
+```
+
+# Results by department
+
+```{r}
+require(dplyr)
+
+department_grouped <- 
+  results_fr_20170423_wt_demog %>%
+  group_by(code_department) %>%
+  summarize(`LE PEN %` = sum(`LE PEN`) / sum(Exprimés),
+            immigrants = sum(immigrants),
+            chomeurs = sum(chomeurs),
+            actifs = sum(actifs),
+            retraites_img2a = sum(retraites_img2a),
+            surf_ha = sum(surf_ha),
+            Inscrits = sum(Inscrits))
+
+mod_dep1 <- 
+  lm("I(`LE PEN %`) ~ 
+    I(immigrants/Inscrits) + 
+    I(chomeurs/(chomeurs+actifs)) + 
+    I(retraites_img2a/Inscrits) + 
+    I(Inscrits/surf_ha)", 
+     data = department_grouped)
+
+```
+
+```{r, echo=F, message=F, warning=F, results='asis'}
+require(stargazer)
+stargazer(mod_reg1, type='html',
+          covariate.labels = c("Immigrants over Registered voters", 
+                               "Unemployed over Workforce",
+                               "Retired over Registered voters",
+                               "Registered voters over region surface"),
+          dep.var.labels   = "Le Pen votes over Valid votes",
+          dep.var.caption  = "First round - Regional level")
+
+```
+
+# Results by commune
+
+```{r}
+load('~/public_git/french_pres_election_17/results_fr_20170423_wt_demog.RData')
+
+mod1 <- 
+  lm("I(`LE PEN %`) ~ 
+    I(immigrants/Inscrits) + 
+    # I(immigrants_50km/inscrits_50km) + 
+    I(chomeurs/(chomeurs+actifs)) + 
+    # I(chomeurs_50km/(chomeurs_50km+actifs_50km)) +  
+    I(retraites_img2a/Inscrits) + 
+    # I(retraites_img2a_50km/inscrits_50km) + 
+    I(Inscrits/(surf_ha /0.01))", 
+     data = results_fr_20170423_wt_demog)
+
+mod2 <- 
+  lm("I(`LE PEN %`) ~ 
+    I(immigrants/Inscrits) + 
+    # I(immigrants_50km/inscrits_50km) + 
+    I(chomeurs/(chomeurs+actifs)) + 
+    # I(chomeurs_50km/(chomeurs_50km+actifs_50km)) +  
+    I(retraites_img2a/Inscrits) + 
+    # I(retraites_img2a_50km/inscrits_50km) + 
+    I(Inscrits/(surf_ha /0.01)) + 
+    I(revenue_median/1000)", 
+     data = results_fr_20170423_wt_demog)
+
+```
+
+
+```{r, echo=F, message=F, warning=F, results='asis'}
+require(stargazer)
+stargazer(mod1, mod2, type='html',
+          covariate.labels = c("Immigrants over Registered voters", 
+                               # "Immigrants over Registered voters (communes within 50km radius)", 
+                               "Unemployed over Workforce",
+                               # "Unemployed over Workforce (communes within 50km radius)",
+                               "Retired over Registered voters",
+                               # "Retired over Registered voters (communes within 50km radius)",
+                               "Registered voters over commune surface (km2)",
+                               "Median revenue per person (thousands €)"),
+          dep.var.labels   = "Le Pen votes over Valid votes",
+          dep.var.caption  = "First round")
+
+```
+
+The number of immigrants, unemployed and retired are calculated at the commune level based on the 2013 census. Median revenue per personed based on 2011 data (with no correction for changes in commune boundaries)
