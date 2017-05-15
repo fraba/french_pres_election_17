@@ -237,6 +237,7 @@ F Statistic
 </td>
 </tr>
 </table>
+
 Results by department
 =====================
 
@@ -454,6 +455,7 @@ F Statistic
 </td>
 </tr>
 </table>
+
 Results by commune
 ==================
 
